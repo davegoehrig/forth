@@ -26,6 +26,7 @@ convience. for the data stack we'll keep the
 top value in [ebp-8] so ebp points at free 
 data stack making our ds0 calculation easier.
 
+~~~text
 ╔════════════════════╦════════════════════╗
 ║ rax -- tos         ║ r8  -- arg5        ║
 ║ rcx -- count       ║ r9  -- arg6        ║
@@ -37,13 +38,14 @@ data stack making our ds0 calculation easier.
 ║ rsi -- src, arg2   ║ r14 -- H           ║
 ║ rdi -- dst, arg1   ║ r15 -- last        ║
 ╚════════════════════╩════════════════════╝
-
+~~~
 
 memory layout
 -------------
 
 our memory layout is going to be fixed to start:
 
+~~~text
 ╔═════════════════════════════════════════╗ < rbx 
 ║ x86_64 preamble, jump to boot           ║
 ╠════════════════════╦════════════════════╣
@@ -60,6 +62,7 @@ our memory layout is going to be fixed to start:
 ║ data stack (16k)                        ║ < rbp ↑
 ║ return stack (16k)                      ║ < rsp ↑ 
 ╚═════════════════════════════════════════╝
+~~~
 
 we'll start with 16 byte preamble that does
 a call 0, pop rbx, sub rbx,5 to get the base
