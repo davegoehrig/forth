@@ -128,5 +128,18 @@ cr ." cmp rax,[rbp-8] 48 3B 45 F8"
 cr ." cmp [rbp-8],rax 48 39 45 F8"
 [x86 reset -8 [rbp] rax cmp db x86]
 
+cr ." mov rax,[r12+1023] 49 8B 84 24 23 10 "
+[x86 reset rax $1023 [r12] mov db x86]
+
+cr ." mov [r12+1023],rax 49 89 84 24 23 10"
+[x86 reset $1023 [r12] rax mov db x86]
+
+cr ." mov rax,[rsp-8] 48 8B 44 24 F8 "
+[x86 reset rax -8 [rsp] mov db x86]
+
+cr ." mov [rsp-8],rax 48 89 44 24 F8 "
+[x86 reset -8 [rsp] rax mov db x86]
+
+
 
 ; tst
