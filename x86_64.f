@@ -31,14 +31,7 @@ package x86_64
 	8 rshift dup $ff & b,
 	8 rshift $ff & b, ;
 
-: imm64, dup $ff & b,
-	8 rshift dup $ff & b,
-	8 rshift dup $ff & b,
-	8 rshift dup $ff & b,
-	8 rshift dup $ff & b,
-	8 rshift dup $ff & b,
-	8 rshift dup $ff & b,
-	8 rshift $ff & b, ;
+: imm64, imm32, imm32, ; 
 
 : short? -80 80 within ;
 : long? short? ~ ;
@@ -94,7 +87,6 @@ package x86_64
 : .b? over 8 & if .b then ;
 : .r? over 8 & if .r then ;
 
-
 : modr/m ( rm reg -- ) 
 	reg swap rm | mod | b, 
 	imm8? if disp imm8, then
@@ -102,6 +94,7 @@ package x86_64
 	nexti ;
 
 : call  ( rm - ) $ff b, 2 modr/m ;
+
 : #call ( imm32 - ) $e8 imm32, ;
 : #jmp  ( imm32 - ) $e9 imm32, ;
 
@@ -114,94 +107,64 @@ package x86_64
 : #jle ( imm32 - ) $0f b, $8e b, imm32, ;
 : #jl  ( imm32 - ) $0f b, $8c b, imm32, ;
 
-: mov ( dst src -- ) 
+0 value op1 
+0 value op2
+: alu2 ( dst src op1 op2 -- )
+	to op2 to op1
 	>r rex .w .r? b, r>
 	rr? if mod11 then
-	mem? if swap $8b else $89 then b, 
+	mem? if swap op1 else op2 then b, 
 	modr/m ; 
 
-: #mov ( reg imm32 - ) 
-	>r rex .w .b? b, 
-	rm $B8 + b, r> imm64, ;
-
-: add  ( dst src -- )
-	>r rex .w .r? b, r>  
-	rr? if mod11 then
-	mem? if swap 3 else 1 then b, 
-	modr/m ;
-	
-: #add ( reg n -- )  
+0 value op3
+: #alu2 ( reg n op1 op2 op3 -- )
+	to op3 to op2 to op1
 	>r rex .w .b? b, r>
 	dup mod?
-	short? if $83 else $81 then
-	b, mod11 0 modr/m ;
+	short? if op1 else op2 then
+	b, mod11 op3 modr/m ;
 
-: sub >r rex .w .r? b, r>  
-	rr? if mod11 then
-	mem? if swap $2b else $29 then b, 
-	modr/m ;
+: alu1 ( reg f -- ) to op1 to op2 rex .w .b? b, op2 b, mod11 op1 modr/m ;
 
-: #sub ( reg n -- )
-	>r rex .w .b? b, r>
-	dup mod?
-	short? if $83 else $81 then
-	b, mod11 5 modr/m ;
+: mov ( dst src -- ) $8b $89 alu2 ;
 
-: and ( dst src -- )
-	>r rex .w .r? b, r>  
-	rr? if mod11 then
-	mem? if swap $23 else $21 then b, 
-	modr/m ;
+: #mov ( reg imm32 imm32 - ) 
+	>r >r rex .w .b? b, 
+	rm $B8 + b, r> r> imm64, ;
 
-: #and ( reg n -- )
-	>r rex .w .b? b, r>
-	dup mod?
-	short? if $83 else $81 then
-	b, mod11 4 modr/m ;
+: add  ( dst src -- )   3   1 alu2 ;
+: sub  ( dst src -- ) $2b $29 alu2 ;
+: and  ( dst src -- ) $23 $21 alu2 ;
+: or   ( dst src -- ) $0b $09 alu2 ;
+: xor  ( dst src -- ) $33 $31 alu2 ;
 
-: or ( dst src -- )
-	>r rex .w .r? b, r>  
-	rr? if mod11 then
-	mem? if swap $0b else $09 then b, 
-	modr/m ;
+: #add ( reg n -- ) $83 $81 0 #alu2 ;
+: #or  ( reg n -- ) $83 $81 1 #alu2 ;
+: #and ( reg n -- ) $83 $81 4 #alu2 ;
+: #sub ( reg n -- ) $83 $81 5 #alu2 ;
+: #xor ( reg n -- ) $83 $81 6 #alu2 ;
 
-: #or ( reg n -- )
-	>r rex .w .b? b, r>
-	dup mod?
-	short? if $83 else $81 then
-	b, mod11 1 modr/m ;
+: inc  ( reg - ) $ff 0 alu1 ;
+: dec  ( reg - ) $ff 1 alu1 ;
+: not  ( reg - ) $f7 2 alu1 ;	
+: neg  ( reg - ) $f7 3 alu1 ;
+: mul  ( reg - ) $f7 4 alu1 ;
+: imul ( reg - ) $f7 5 alu1 ;
+: div  ( reg - ) $f7 6 alu1 ;
+: idiv ( reg - ) $f7 7 alu1 ;
 
-: xor ( dst src -- )
-	>r rex .w .r? b, r>  
-	rr? if mod11 then
-	mem? if swap $33 else $31 then b, 
-	modr/m ;
-
-: #xor ( reg n -- )
-	>r rex .w .b? b, r>
-	dup mod?
-	short? if $83 else $81 then
-	b, mod11 6 modr/m ;
-
-: dec  ( reg - ) rex .w .b? b, $ff b, mod11 1 modr/m ;
-: inc  ( reg - ) rex .w .b? b, $ff b, mod11 0 modr/m ;
-
-: mul  ( reg - ) rex .w .b? b, $f7 b, mod11 4 modr/m ;
-: imul ( reg - ) rex .w .b? b, $f7 b, mod11 5 modr/m ;
-: div  ( reg - ) rex .w .b? b, $f7 b, mod11 6 modr/m ;
-: idiv ( reg - ) rex .w .b? b, $f7 b, mod11 7 modr/m ;
-: not  ( reg - ) rex .w .b? b, $f7 b, mod11 2 modr/m ;	
-: neg  ( reg - ) rex .w .b? b, $f7 b, mod11 3 modr/m ;
+: push ( reg - ) dup 8 & if rex .b b, then rm $50 + b, ;
+: pop  ( reg - ) dup 8 & if rex .b b, then rm $58 + b, ;
 
 : #test ( n reg - ) rex .w .r? b, $f7 b, mod11 0 modr/m imm32, ; 
 
-: nop  ( - ) $90 b, ;
-: ret  ( - ) $c3 b, ;
+: nop     ( - ) $90 b, ;
+: ret     ( - ) $c3 b, ;
 : syscall ( - ) $0f b, $05 b, ;
-: cqo ( - ) rex .w b, $99 b, ;
+: cqo     ( - ) rex .w b, $99 b, ;
+
 
 create buffer  $1000 allot
-
 : reset buffer $1000 erase buffer to 'b ;
 : db buffer $10 dump ;
 
