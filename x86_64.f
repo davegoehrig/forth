@@ -2,7 +2,7 @@
 \ --------
 \ This is a minimal x86_64 assembler
 
-marker x86_64
+package x86_64
 
 : ~ not ;
 : & and ;
@@ -15,8 +15,8 @@ marker x86_64
 : .x $02 | ;	\ sib index extension
 : .b $01 | ;	\ mod r/m extension
 
-: r/m 7 & ;
-: reg r/m 3 lshift ;
+: rm  7 & ;
+: reg rm 3 lshift ;
 
 0 value 'b
 
@@ -94,8 +94,6 @@ marker x86_64
 : .b? over 8 & if .b then ;
 : .r? over 8 & if .r then ;
 
-: reg 7 & 3 lshift ;
-: rm  7 & ;
 
 : modr/m ( rm reg -- ) 
 	reg swap rm | mod | b, 
@@ -106,10 +104,10 @@ marker x86_64
 : call ( rm - ) $ff b, 2 modr/m ;
 : jmp ( imm32 - ) $e9 imm32, ;
 
-: js  ( imm32 - )
-: jns ( imm32 - )
-: jz  ( imm32 - )
-: jnz ( imm32 - )
+: js  ( imm32 - ) ;
+: jns ( imm32 - ) ;
+: jz  ( imm32 - ) ;
+: jnz ( imm32 - ) ;
 
 : mov ( dst src -- ) 
 	>r rex .w .r? b, r>
@@ -194,4 +192,13 @@ marker x86_64
 : cqo ( - ) rex .w b, $99 b, ;
 
 create buffer  $1000 allot
+
 : reset buffer $1000 erase buffer to 'b ;
+: db buffer $10 dump ;
+
+public
+
+: [x86 x86_64 +order ; immediate
+: x86] x86_64 -order ; immediate
+
+end-package
