@@ -116,4 +116,17 @@ cr ." or  rax,8 48 83 C8 08 "
 cr ." xor rax,8 48 83 F0 08 "
 [x86 reset rax 8 #xor db x86]
 
+cr ." test rax,rax 48 85 C0 "
+[x86 reset rax rax test db x86]
+
+cr ." test rax,[rbp-8] 48 85 45 f8 "
+[x86 reset rax -8 [rbp] test db x86]
+
+cr ." cmp rax,[rbp-8] 48 3B 45 F8"
+[x86 reset rax -8 [rbp] cmp db x86]
+
+cr ." cmp [rbp-8],rax 48 39 45 F8"
+[x86 reset -8 [rbp] rax cmp db x86]
+
+
 ; tst
