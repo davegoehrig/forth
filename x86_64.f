@@ -101,19 +101,28 @@ package x86_64
 	imm32? if disp imm32, then 
 	nexti ;
 
-: call ( rm - ) $ff b, 2 modr/m ;
-: jmp ( imm32 - ) $e9 imm32, ;
+: call  ( rm - ) $ff b, 2 modr/m ;
+: #call ( imm32 - ) $e8 imm32, ;
+: #jmp  ( imm32 - ) $e9 imm32, ;
 
-: js  ( imm32 - ) ;
-: jns ( imm32 - ) ;
-: jz  ( imm32 - ) ;
-: jnz ( imm32 - ) ;
+: #js  ( imm32 - ) $0f b, $88 b, imm32, ;
+: #jns ( imm32 - ) $0f b, $89 b, imm32, ;
+: #jz  ( imm32 - ) $0f b, $84 b, imm32, ;
+: #jnz ( imm32 - ) $0f b, $85 b, imm32, ;
+: #jge ( imm32 - ) $0f b, $8d b, imm32, ;
+: #jg  ( imm32 - ) $0f b, $8f b, imm32, ;
+: #jle ( imm32 - ) $0f b, $8e b, imm32, ;
+: #jl  ( imm32 - ) $0f b, $8c b, imm32, ;
 
 : mov ( dst src -- ) 
 	>r rex .w .r? b, r>
 	rr? if mod11 then
 	mem? if swap $8b else $89 then b, 
 	modr/m ; 
+
+: #mov ( reg imm32 - ) 
+	>r rex .w .b? b, 
+	rm $B8 + b, r> imm64, ;
 
 : add  ( dst src -- )
 	>r rex .w .r? b, r>  
