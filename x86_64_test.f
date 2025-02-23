@@ -140,6 +140,7 @@ cr ." mov rax,[rsp-8] 48 8B 44 24 F8 "
 cr ." mov [rsp-8],rax 48 89 44 24 F8 "
 [x86 reset -8 [rsp] rax mov db x86]
 
-
+cr ." xchg rax,[rbp-8] 48 87 45 f8 "
+[x86 reset rax -8 [rbp] xchg db x86]
 
 ; tst

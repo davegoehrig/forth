@@ -147,6 +147,7 @@ package x86_64
 : xor  ( dst src -- ) $33 $31 alu2 ;
 : test ( dst src -- ) $85 $85 alu2 ;
 : cmp  ( dst src -- ) $3b $39 alu2 ;
+: xchg ( dst src -- ) $87 $87 alu2 ;
 
 : #add ( reg n -- ) $83 $81 0 #alu2 ;
 : #or  ( reg n -- ) $83 $81 1 #alu2 ;
