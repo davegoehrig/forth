@@ -315,11 +315,16 @@ def max ( n1 n2 -- n3 ) [x86
 x86]
 
 def within ( n lo hi -- f ) [x86
-	rax push
-	rax -16 [rbp] mov
-	rax -8 [rbp] cmp 
-	\ TODO
-	\ figure out the jumps
+	r11 -16 [rbp] mov 	\ n
+	rcx -8 [rbp] mov 	\ lo
+	rdx rax mov 		\ hi
+	rax rax xor 		\ zero rax
+	r11 rcx cmp		\ n - lo 
+	12 #jl
+	r11 rdx cmp		\ n - hi 3 bytes 
+	3 #jg			\ 6 bytes
+	rax not			\ 3 bytes
+	ret
 x86]
 
 

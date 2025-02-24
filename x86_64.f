@@ -9,7 +9,6 @@ package x86_64
 : | or ;
 : ^ xor ;
 
-
 0 value 'b
 
 : b, 'b c! 'b 1 + to 'b ;
@@ -42,18 +41,18 @@ package x86_64
 : .w! rex 8 | to rex ;
 : .b! rex 1 | to rex ;
 : .r! rex 4 | to rex ;
-: .b? dup 8 & if .b! then ;
-: .r? dup 8 & if .r! then ;
+: .b? dup 8 & if .b! ." set b!" then ;
+: .r? over 8 & if .r! ." set r!" then ;	\ check if dest is a register
 : rex, $40 rex | b, 0 to rex ; 	\ we're always wide for now
 
-: r15 $f .b! ;
-: r14 $e .b! ;
-: r13 $d .b! ;
-: r12 $c .b! ;
-: r11 $b .b! ;
-: r10 $a .b! ;
-: r9  9  .b! ;
-: r8  8  .b! ;
+: r15 $f ;
+: r14 $e ;
+: r13 $d ;
+: r12 $c ;
+: r11 $b ;
+: r10 $a ;
+: r9  9  ;
+: r8  8  ;
 : rdi 7 ;
 : rsi 6 ;
 : rbp 5 ;
@@ -122,19 +121,20 @@ package x86_64
 0 value op1 
 0 value op2
 : alu2 ( dst src op1 op2 -- )
-	to op2 to op1 .w! rex,
+	to op2 to op1 .b? .r? .w! rex,
 	rr? if mod11 then
 	mem? if swap op1 else op2 then b, 
+	." rex is " rex .
 	modr/m ; 
 
 0 value op3
 : #alu2 ( reg n op1 op2 op3 -- )
-	to op3 to op2 to op1 .w! rex,
+	to op3 to op2 to op1 >r .b? .w! rex, r>
 	dup imm?
 	short? if op1 else op2 then
 	b, mod11 op3 modr/m ;
 
-: alu1 ( reg f -- ) to op1 to op2 .w! rex, op2 b, mod11 op1 modr/m ;
+: alu1 ( reg f -- ) to op1 to op2 .b? .w! rex, op2 b, mod11 op1 modr/m ;
 
 : mov ( dst src -- ) $8b $89 alu2 ;
 
