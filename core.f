@@ -298,6 +298,22 @@ def <0 ( x -- f ) [x86
 	ret
 x86] 
 
+def 0> ( x -- f ) [x86
+	rdx rax mov
+	rax rax xor
+	rdx 0 cmp
+	3 #jg rax not
+	ret
+x86]	
+
+def 0= ( x -- f ) [x86
+	rdx rax mov
+	rax rax xor
+	rdx rdx test
+	3 #jnz rax not
+	ret
+x86]
+
 def min ( n1 n2 -- n3 ) [x86
 	rdx -8 [rbp] mov
 	rbp 8 #sub
@@ -324,6 +340,159 @@ def within ( n lo hi -- f ) [x86
 	r11 rdx cmp		\ n - hi 3 bytes 
 	3 #jg			\ 6 bytes
 	rax not			\ 3 bytes
+	ret
+x86]
+
+def 1+ ( n -- n+1 ) [x86
+	rax inc
+	ret
+x86]
+
+def 1- ( n -- n-1) [x86
+	rax dec
+	ret
+x86]
+
+def 2+ ( n -- n+2 ) [x86
+	rax 2 #add
+	ret
+x86]
+
+def 2- ( n -- n-2 ) [x86
+	rax 2 #sub
+	ret
+x86]
+
+def 2/ ( n -- n-2 ) [x86
+	rax 2 #sar
+	ret
+x86]
+
+def 2* ( n --  n*2 ) [x86
+	rax 2 #shl
+	ret
+x86]
+
+def u2/ ( u -- u/2 ) [x86
+	rax 2 #shr
+	ret
+x86]
+
+def 4+ ( n -- n+4 ) [x86
+	rax 4 #add
+	ret
+x86]
+
+def 4- ( n -- n+4 ) [x86
+	rax 4 #sub
+	ret
+x86]
+
+def 8+ ( n -- n+4 ) [x86
+	rax 8 #add
+	ret
+x86]
+
+def 8- ( n -- n+4 ) [x86
+	rax 8 #sub
+	ret
+x86]
+
+def lshift ( x n -- x2 ) [x86
+	ecx rax mov
+	rax -8 [rbp] mov
+	$48 b, $d3 b, $e0 b,	\ shl rax,cl
+	[rbp] 8 #sub
+	ret
+x86] 
+
+def rshift ( x n -- x2 ) [x86
+	ecx rax mov
+	rax -8 [rbp] mov
+	$48 b, $d3 b, $e8 b,	\ shl rax,cl
+	[rbp] 8 #sub
+	ret
+x86] 
+
+def lshifta ( x n -- x2 ) [x86
+	ecx rax mov
+	rax -8 [rbp] mov
+	$48 b, $d3 b, $e0 b,	\ shl rax,cl
+	[rbp] 8 #sub
+	ret
+x86] 
+
+def rshifta ( x n -- x2 ) [x86
+	ecx rax mov
+	rax -8 [rbp] mov
+	$48 b, $d3 b, $f8 b,	\ shl rax,cl
+	[rbp] 8 #sub
+	ret
+x86] 
+
+def cell ( -- n ) [x86
+	rbp 8 #add
+	-8 [rbp] rax mov
+	rax 8 #mov
+	ret
+x86]
+
+def -cell ( -- n ) [x86
+	rbp 8 #add
+	-8 [rbp] rax mov
+	rax -8 #mov
+	ret
+x86]
+
+def cell+ ( n -- n2 ) [x86
+	rax 8 #add
+	ret
+x86]
+
+def cell- ( n -- n2 ) [x86
+	rax -8 #add
+	ret
+x86]
+
+def cells ( n -- n*8 ) [x86
+	rax 3 #shl
+	ret
+x86]
+
+def cell/ ( n -- n/8 ) [x86
+	rax 3 #shr
+	ret
+x86]
+
+def char+ ( n -- n+1 ) [x86
+	rax inc
+	ret
+x86]
+
+\ x86_64 is byte aligned
+def chars ( n -- n ) [x86 ret x86]
+def aligned ( addr -- addr ) [x86 ret x86]
+def align ( -- ) [x86 ret x86]
+
+def unloop ( -- ) [x86
+	rsp -16 #add
+	ret
+end
+
+
+\ TODO figure out what the actual return stack layout will be for loops
+def i ( -- n ) [x86
+	ebp 8 #add
+	-8 [ebp] rax mov
+	rax 0 [rsp] mov
+	ret
+x86]
+
+\ TODO figure out what the actual return stack layout will be for loops
+def j ( -- n )  [x86
+	ebp 8 #add
+	-8 [ebp] rax mov
+	rax -16 [rsp] mov
 	ret
 x86]
 

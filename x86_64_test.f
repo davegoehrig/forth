@@ -146,4 +146,20 @@ cr ." xchg rax,[rbp-8] 48 87 45 f8 "
 cr ." mov r11, [rbp-16] "
 [x86 reset r11 -16 [rbp] mov db x86]
 
+cr ." xor rax rax "
+[x86 reset rax rax xor db x86]
+
+cr ." rax 2 #sar 48 C1 F8 02 "
+[x86 reset rax 2 #sar db x86] 
+
+cr ." rax 2 #sal 48 C1 E0 02 "
+[x86 reset rax 2 #sal db x86] 
+
+cr ." rax 2 #shr 48 C1 E8 02 "
+[x86 reset rax 2 #shr db x86] 
+
+cr ." rax 2 #shl 48 C1 E0 02 "
+[x86 reset rax 2 #shl db x86] 
+
+
 ; tst

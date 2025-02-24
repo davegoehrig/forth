@@ -153,6 +153,10 @@ package x86_64
 : #and ( reg n -- ) $83 $81 4 #alu2 ;
 : #sub ( reg n -- ) $83 $81 5 #alu2 ;
 : #xor ( reg n -- ) $83 $81 6 #alu2 ;
+: #sar ( reg n -- ) $c1 $c1 7 #alu2 ;
+: #sal ( reg n -- ) $c1 $c1 4 #alu2 ;
+: #shr ( reg n -- ) $c1 $c1 5 #alu2 ;
+: #shl ( reg n -- ) $c1 $c1 4 #alu2 ;
 
 : inc  ( reg - ) $ff 0 alu1 ;
 : dec  ( reg - ) $ff 1 alu1 ;
