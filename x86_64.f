@@ -41,8 +41,8 @@ package x86_64
 : .w! rex 8 | to rex ;
 : .b! rex 1 | to rex ;
 : .r! rex 4 | to rex ;
-: .b? dup 8 & if .b! ." set b!" then ;
-: .r? over 8 & if .r! ." set r!" then ;	\ check if dest is a register
+: .b? dup 8 & if .b! then ;
+: .r? over 8 & if .r! then ;	\ check if dest is a register
 : rex, $40 rex | b, 0 to rex ; 	\ we're always wide for now
 
 : r15 $f ;
@@ -124,7 +124,6 @@ package x86_64
 	to op2 to op1 .b? .r? .w! rex,
 	rr? if mod11 then
 	mem? if swap op1 else op2 then b, 
-	." rex is " rex .
 	modr/m ; 
 
 0 value op3
